@@ -1282,13 +1282,13 @@
                 musicPlaying = false;
                 document.getElementById('musicControl').classList.remove('playing');
                 document.getElementById('musicIcon').textContent = '🎵';
-                document.getElementById('musicText').textContent = 'Play Music';
+                document.getElementById('musicText').textContent = 'The Reason';
             } else {
                 bgMusic.play().then(() => {
                     musicPlaying = true;
                     document.getElementById('musicControl').classList.add('playing');
                     document.getElementById('musicIcon').textContent = '🎶';
-                    document.getElementById('musicText').textContent = 'Pause Music';
+                    document.getElementById('musicText').textContent = 'Adeee nhiiii';
                 }).catch(err => {
                     console.log('Audio play failed (probably no file yet):', err);
                 });
