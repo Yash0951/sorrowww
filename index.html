@@ -1001,16 +1001,17 @@
         </defs>
     </svg>
 
-    <!-- bg music -->
-    <audio id="bgMusic" loop>
-    <source src="cuckoo_ki_neend.mp3" type="audio/mpeg">
-</audio>
-
     <!-- Floating Particles Layer -->
     <div class="particles-layer" id="particles"></div>
 
     <!-- Celebration Layer -->
     <div class="celebration" id="celebration"></div>
+
+    <!-- Background Music (replace src with your own song file) -->
+    <audio id="bgMusic" loop preload="auto">
+        <!-- Put your own music file in the same folder and change src below -->
+        <source src="cuckoo_ki_neend.mp3" type="audio/mpeg">
+    </audio>
 
     <!-- Music Control -->
     <div class="music-control" id="musicControl" onclick="toggleMusic()">
@@ -1271,106 +1272,26 @@
     </section>
 
     <script>
-        // ===== Audio System (Web Audio API) =====
-        let audioContext = null;
+        // ===== Audio System =====
         let musicPlaying = false;
-        let oscillatorNodes = [];
-        let gainNode = null;
-        let musicInterval = null;
-
-        const romanticMelody = [
-            { note: 261.63, duration: 0.6 }, // C4
-            { note: 293.66, duration: 0.6 }, // D4
-            { note: 329.63, duration: 0.8 }, // E4
-            { note: 392.00, duration: 0.6 }, // G4
-            { note: 329.63, duration: 0.8 }, // E4
-            { note: 293.66, duration: 0.6 }, // D4
-            { note: 261.63, duration: 1.0 }, // C4
-            { note: 392.00, duration: 0.6 }, // G4
-            { note: 349.23, duration: 0.8 }, // F4
-            { note: 329.63, duration: 0.6 }, // E4
-            { note: 293.66, duration: 1.2 }, // D4
-        ];
-
-        const music = document.getElementById("bgMusic");
-
-function toggleMusic() {
-    if (music.paused) {
-        music.play();
-        document.getElementById('musicControl').classList.add('playing');
-        document.getElementById('musicText').textContent = 'Pause Music';
-    } else {
-        music.pause();
-        document.getElementById('musicControl').classList.remove('playing');
-        document.getElementById('musicText').textContent = 'Play Music';
-    }
-}
-
-        function initAudio() {
-            if (!audioContext) {
-                audioContext = new (window.AudioContext || window.webkitAudioContext)();
-            }
-        }
-
-        function playNote(frequency, duration, startTime) {
-            if (!audioContext) return;
-            const osc = audioContext.createOscillator();
-            const gain = audioContext.createGain();
-            
-            osc.type = 'sine';
-            osc.frequency.value = frequency;
-            
-            gain.gain.setValueAtTime(0, startTime);
-            gain.gain.linearRampToValueAtTime(0.15, startTime + 0.1);
-            gain.gain.exponentialRampToValueAtTime(0.01, startTime + duration);
-            
-            osc.connect(gain);
-            gain.connect(audioContext.destination);
-            
-            osc.start(startTime);
-            osc.stop(startTime + duration);
-            
-            oscillatorNodes.push(osc);
-        }
-
-        function startMusic() {
-            if (!audioContext) initAudio();
-            if (audioContext.state === 'suspended') audioContext.resume();
-            
-            let currentTime = audioContext.currentTime;
-            let noteIndex = 0;
-            
-            musicInterval = setInterval(() => {
-                if (!musicPlaying) return;
-                const note = romanticMelody[noteIndex];
-                playNote(note.note, note.duration, currentTime);
-                currentTime += note.duration + 0.15;
-                noteIndex = (noteIndex + 1) % romanticMelody.length;
-            }, 650);
-            
-            musicPlaying = true;
-            document.getElementById('musicControl').classList.add('playing');
-            document.getElementById('musicIcon').textContent = '🎶';
-            document.getElementById('musicText').textContent = 'Pause Music';
-        }
-
-        function stopMusic() {
-            musicPlaying = false;
-            if (musicInterval) clearInterval(musicInterval);
-            oscillatorNodes.forEach(osc => {
-                try { osc.stop(); } catch(e) {}
-            });
-            oscillatorNodes = [];
-            document.getElementById('musicControl').classList.remove('playing');
-            document.getElementById('musicIcon').textContent = '🎵';
-            document.getElementById('musicText').textContent = 'Play Music';
-        }
+        const bgMusic = document.getElementById('bgMusic');
 
         function toggleMusic() {
             if (musicPlaying) {
-                stopMusic();
+                bgMusic.pause();
+                musicPlaying = false;
+                document.getElementById('musicControl').classList.remove('playing');
+                document.getElementById('musicIcon').textContent = '🎵';
+                document.getElementById('musicText').textContent = 'Play Music';
             } else {
-                startMusic();
+                bgMusic.play().then(() => {
+                    musicPlaying = true;
+                    document.getElementById('musicControl').classList.add('playing');
+                    document.getElementById('musicIcon').textContent = '🎶';
+                    document.getElementById('musicText').textContent = 'Pause Music';
+                }).catch(err => {
+                    console.log('Audio play failed (probably no file yet):', err);
+                });
             }
         }
 
@@ -1658,15 +1579,7 @@ function toggleMusic() {
             
             // Start music if not playing
             if (!musicPlaying) {
-                startMusic();
-            }
-            
-            // Swell music effect by playing a chord
-            if (audioContext) {
-                const now = audioContext.currentTime;
-                [261.63, 329.63, 392.00, 523.25].forEach((freq, i) => {
-                    playNote(freq, 3, now + i * 0.1);
-                });
+                toggleMusic();
             }
         }
 
@@ -1745,5 +1658,5 @@ function toggleMusic() {
             });
         });
     </script>
-</body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a0cca1911e025403',t:'MTc4MTY0MjQ0Mg=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
